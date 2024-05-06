@@ -32,7 +32,7 @@ const CategoryItem = ({ title, index ,isActive,handleChangeCategory}) => {
       <Pressable 
       onPress={()=>handleChangeCategory(isActive?null:title)}
       style={[styles.category,{backgroundColor}]}>
-        <Text style={[styles.title,{color}]}>{title.charAt(0).toUpperCase() + title.slice(1)}</Text>
+        <Text style={[styles.title,{color}]}>{title}</Text>
       </Pressable>
     </Animated.View>
   );
