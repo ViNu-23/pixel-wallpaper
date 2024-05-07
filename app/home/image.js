@@ -6,7 +6,7 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
-  Text
+  Text,
 } from "react-native";
 import React, { useState } from "react";
 import { BlurView } from "expo-blur";
@@ -50,16 +50,32 @@ export const image = () => {
   };
 
   const handleDownloadImage = async () => {
-    setStatus("downloading");
-    await downloadFile();
-    if (uri) showToast("Image saved");
+    if (Platform.OS == "web") {
+      const anchor=document.createElement("a");
+      anchor.href=imageURL;
+      anchor.target='';
+      anchor.download=fileName||'download';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+
+    } else {
+      setStatus("downloading");
+      await downloadFile();
+      let uri = await downloadFile();
+      if (uri) showToast("Image saved");
+    }
   };
 
   const handleShareImage = async () => {
-    setStatus("sharing");
-    let uri = await downloadFile();
-    if (uri) {
-      await Sharing.shareAsync(uri);
+    if (Platform.OS == "web") {
+      showToast("Link Copied");
+    } else {
+      setStatus("sharing");
+      let uri = await downloadFile();
+      if (uri) {
+        await Sharing.shareAsync(uri);
+      }
     }
   };
 
@@ -75,7 +91,7 @@ export const image = () => {
     }
   };
 
-  const showToast = ( message ) => {
+  const showToast = (message) => {
     Toast.show({
       type: "success",
       text1: message,
@@ -134,7 +150,7 @@ export const image = () => {
           )}
         </Animated.View>
       </View>
-      <Toast config={toastConfig} visibilityTime={2500}/>
+      <Toast config={toastConfig} visibilityTime={2500} />
     </BlurView>
   );
 };
@@ -170,18 +186,17 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     borderCurve: "continuous",
   },
-toast:{
-    padding:15,
-    paddingHorizontal:30,
-    borderRadius:theme.radius.lg,
-    justifyContent:'center',
+  toast: {
+    padding: 15,
+    paddingHorizontal: 30,
+    borderRadius: theme.radius.lg,
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor:'rgba(255,255,255,0.15)'
-},
-toastText:{
-    fontSize:hp(1.8),
-    fontWeight:theme.fontWeight.medium,
-    color:theme.colors.white,
-}
-
+    backgroundColor: "rgba(255,255,255,0.15)",
+  },
+  toastText: {
+    fontSize: hp(1.8),
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.white,
+  },
 });
